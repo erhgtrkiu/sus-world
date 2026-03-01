@@ -347,16 +347,19 @@
             text-shadow: 0 0 5px #00ff00;
         }
 
-        .clear-chat-btn {
+        .admin-tool-btn {
             font-size: 0.7rem;
-            color: #ff4d4d;
-            background: none;
-            border: 1px solid #ff4d4d;
-            padding: 2px 5px;
-            border-radius: 3px;
+            color: #fff;
+            background: #333;
+            border: 1px solid #444;
+            padding: 4px 8px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-left: 10px;
+            margin-left: 5px;
+            transition: 0.2s;
         }
+
+        .admin-tool-btn:hover { background: #444; }
 
         /* ФУТЕР */
         .tab-footer { margin-top: auto; padding: 25px; color: #444; font-size: 0.8rem; }
@@ -444,8 +447,9 @@
         
         <div id="admin-panel">
             ⚡ СТАТУС: АДМИНИСТРАТОР (MIKA)
-            <button class="clear-chat-btn" onclick="clearChat()">Очистить чат</button>
-            <button class="clear-chat-btn" onclick="adminLogout()" style="border-color: #fff; color: #fff;">Выйти</button>
+            <button class="admin-tool-btn" onclick="clearChat()" style="color:#ff4d4d;">Очистить</button>
+            <button class="admin-tool-btn" onclick="simulateUserMsg()">Тест-сообщение</button>
+            <button class="admin-tool-btn" onclick="adminLogout()">Выход</button>
         </div>
         
         <div class="chat-container">
@@ -462,63 +466,45 @@
         </div>
         
         <button id="admin-login-link" class="admin-login-btn" onclick="adminLogin()">Вход для персонала</button>
-        <div class="tab-footer">ВАШИ СООБЩЕНИЯ СОХРАНЯЮТСЯ ЛОКАЛЬНО.</div>
+        <div class="tab-footer">ВАШИ СООБЩЕНИЯ СОХРАНЯЮТСЯ В БРАУЗЕРЕ.</div>
     </section>
 
     <script>
-        // Инициализация данных при загрузке
+        /* =========================================
+           ОСНОВНАЯ ЛОГИКА И СОХРАНЕНИЕ
+        ========================================= */
+
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+        // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             checkAdminStatus();
             loadChatHistory();
         });
 
-        // Переключение вкладок
-        function openTab(tabName) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
-
-            const buttons = document.querySelectorAll('.navbar button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById(tabName).classList.add('active');
-            document.getElementById('btn-' + tabName).classList.add('active');
-        }
-
-        // Копирование IP
-        function copyIP() {
-            const ip = "play.susworld.net";
-            navigator.clipboard.writeText(ip).then(() => {
-                alert("⚔️ IP скопирован! Ждем тебя в мире SUS WORLD!");
-            });
-        }
-
-        /* =========================================
-           ЛОГИКА ЧАТА И ПОДДЕРЖКИ
-        ========================================= */
-        
-        let isAdmin = localStorage.getItem('isAdmin') === 'true';
-
         function checkAdminStatus() {
+            const panel = document.getElementById('admin-panel');
+            const loginBtn = document.getElementById('admin-login-link');
             if (isAdmin) {
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('admin-login-link').style.display = 'none';
+                panel.style.display = 'block';
+                loginBtn.style.display = 'none';
             } else {
-                document.getElementById('admin-panel').style.display = 'none';
-                document.getElementById('admin-login-link').style.display = 'block';
+                panel.style.display = 'none';
+                loginBtn.style.display = 'block';
             }
         }
 
         function adminLogin() {
             const login = prompt("Логин:");
             const pass = prompt("Пароль:");
-
             if (login === "mika" && pass === "2713") {
                 isAdmin = true;
                 localStorage.setItem('isAdmin', 'true');
                 checkAdminStatus();
-                alert("Доступ разрешен, Mika! Теперь ты пишешь от имени Администрации.");
+                alert("Доступ разрешен, Mika!");
+                loadChatHistory(); // Перерисовать с учетом прав
             } else {
-                alert("Ошибка! Неверные данные.");
+                alert("Ошибка доступа!");
             }
         }
 
@@ -526,89 +512,96 @@
             isAdmin = false;
             localStorage.removeItem('isAdmin');
             checkAdminStatus();
-            alert("Вы вышли из режима админа.");
+            loadChatHistory();
         }
 
+        // Переключение вкладок
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.getElementById('btn-' + tabName).classList.add('active');
+        }
+
+        // Работа с чатом
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
-            
-            if (text === "") return;
+            if (!text) return;
 
-            const messageObj = {
+            const msg = {
                 text: text,
-                type: isAdmin ? 'admin' : 'user',
+                sender: isAdmin ? 'admin' : 'user',
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             };
 
-            // Сохраняем в localStorage
-            saveMessage(messageObj);
-            
-            // Отображаем
-            renderMessage(messageObj);
-
+            saveAndRender(msg);
             input.value = "";
-            const container = document.getElementById('chat-messages');
-            container.scrollTop = container.scrollHeight;
 
-            // Имитация ответа, если пишет обычный юзер
+            // Если пишет юзер, имитируем "получение сообщения" на стороне админа
             if (!isAdmin) {
                 setTimeout(() => {
                     const reply = {
-                        text: "Твое послание доставлено в замок. Ожидай ответа мастера!",
-                        type: 'admin',
+                        text: "Запрос принят. Жди ответа админа!",
+                        sender: 'admin',
                         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                     };
-                    renderMessage(reply);
-                    saveMessage(reply);
-                    container.scrollTop = container.scrollHeight;
-                }, 1500);
+                    saveAndRender(reply);
+                }, 1000);
             }
+        }
+
+        // СЕКРЕТНАЯ ФУНКЦИЯ ДЛЯ ТЕБЯ: Имитация сообщения от игрока
+        function simulateUserMsg() {
+            const testMsg = {
+                text: "Привет, у меня проблема с заходом на сервер!",
+                sender: 'user',
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            saveAndRender(testMsg);
+        }
+
+        function saveAndRender(msg) {
+            let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            history.push(msg);
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+            renderMessage(msg);
         }
 
         function renderMessage(msg) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
-            div.className = `message ${msg.type === 'admin' ? 'msg-admin' : 'msg-user'}`;
-            div.innerHTML = `${msg.text} <span style="display:block; font-size:0.6rem; opacity:0.5; margin-top:5px; text-align:right;">${msg.time}</span>`;
+            div.className = `message ${msg.sender === 'admin' ? 'msg-admin' : 'msg-user'}`;
+            div.innerHTML = `${msg.text} <span style="display:block; font-size:0.6rem; opacity:0.4; margin-top:5px; text-align:right;">${msg.time}</span>`;
             container.appendChild(div);
-        }
-
-        function saveMessage(msg) {
-            let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-            history.push(msg);
-            localStorage.setItem('chatHistory', JSON.stringify(history));
+            container.scrollTop = container.scrollHeight;
         }
 
         function loadChatHistory() {
             const container = document.getElementById('chat-messages');
-            container.innerHTML = ""; // Очистка перед загрузкой
-            
+            container.innerHTML = "";
             let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
             
             if (history.length === 0) {
-                renderMessage({
-                    text: "Приветствуем! Опиши свою проблему или предложение, и наши мастера помогут тебе.",
-                    type: 'admin',
-                    time: "--:--"
-                });
+                renderMessage({text: "Добро пожаловать в поддержку SUS WORLD!", sender: 'admin', time: "--:--"});
             } else {
-                history.forEach(msg => renderMessage(msg));
+                history.forEach(m => renderMessage(m));
             }
-            container.scrollTop = container.scrollHeight;
         }
 
         function clearChat() {
-            if (confirm("Очистить всю историю переписки?")) {
+            if (confirm("Удалить все сообщения?")) {
                 localStorage.removeItem('chatHistory');
                 loadChatHistory();
             }
         }
 
-        function handleKey(e) {
-            if (e.key === 'Enter') sendMessage();
+        function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+        
+        function copyIP() {
+            navigator.clipboard.writeText("play.susworld.net");
+            alert("⚔️ IP скопирован!");
         }
     </script>
-
 </body>
 </html>
