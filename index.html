@@ -252,23 +252,31 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             background: url('https://www.transparenttextures.com/patterns/dark-matter.png');
         }
 
         .message {
-            max-width: 80%;
-            padding: 10px 15px;
+            max-width: 85%;
+            padding: 12px 18px;
             border-radius: 15px;
             font-size: 0.95rem;
             position: relative;
             text-align: left;
+            word-wrap: break-word;
+            animation: msgPop 0.3s ease-out;
+        }
+
+        @keyframes msgPop {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .msg-user {
             align-self: flex-end;
             background: var(--user-msg);
             border-bottom-right-radius: 2px;
+            color: #fff;
         }
 
         .msg-admin {
@@ -279,7 +287,7 @@
         }
 
         .msg-admin::before {
-            content: '👑 АДМИН';
+            content: '👑 АДМИНИСТРАЦИЯ';
             display: block;
             font-size: 0.7rem;
             color: var(--main-color);
@@ -312,15 +320,21 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            background: var(--main-color-hover);
         }
 
         .admin-login-btn {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #555;
             background: none;
             border: none;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
+            text-decoration: underline;
         }
 
         /* Панель админа */
@@ -329,7 +343,19 @@
             margin-bottom: 10px;
             color: #00ff00;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .clear-chat-btn {
+            font-size: 0.7rem;
+            color: #ff4d4d;
+            background: none;
+            border: 1px solid #ff4d4d;
+            padding: 2px 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
         }
 
         /* ФУТЕР */
@@ -415,28 +441,36 @@
 
     <section id="support" class="tab-content">
         <h2 style="font-size: 2.5rem; margin-bottom: 20px;">ТЕХНИЧЕСКАЯ ПОДДЕРЖКА</h2>
-        <div id="admin-panel">⚡ ВЫ ВОШЛИ КАК АДМИНИСТРАТОР (MIKA)</div>
+        
+        <div id="admin-panel">
+            ⚡ СТАТУС: АДМИНИСТРАТОР (MIKA)
+            <button class="clear-chat-btn" onclick="clearChat()">Очистить чат</button>
+            <button class="clear-chat-btn" onclick="adminLogout()" style="border-color: #fff; color: #fff;">Выйти</button>
+        </div>
         
         <div class="chat-container">
             <div class="chat-header">
-                <span>💬 Прямая связь с залом совета</span>
-                <span style="font-size: 0.8rem; color: #888;">Онлайн</span>
+                <span>💬 Прямая связь с советом</span>
+                <span style="font-size: 0.8rem; color: #00ff00;">● Online</span>
             </div>
             <div id="chat-messages">
-                <div class="message msg-admin">Приветствуем! Опиши свою проблему, и наши мастера помогут тебе.</div>
-            </div>
+                </div>
             <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Введите ваше сообщение..." onkeypress="handleKey(event)">
+                <input type="text" id="chat-input" placeholder="Напишите сообщение..." onkeypress="handleKey(event)">
                 <button onclick="sendMessage()">ОТПРАВИТЬ</button>
             </div>
         </div>
         
-        <button class="admin-login-btn" onclick="adminLogin()">Вход для персонала</button>
-        <div class="tab-footer">ВАШИ СООБЩЕНИЯ ВИДЯТ ТОЛЬКО АДМИНИСТРАТОРЫ.</div>
+        <button id="admin-login-link" class="admin-login-btn" onclick="adminLogin()">Вход для персонала</button>
+        <div class="tab-footer">ВАШИ СООБЩЕНИЯ СОХРАНЯЮТСЯ ЛОКАЛЬНО.</div>
     </section>
 
     <script>
-        let isAdmin = false;
+        // Инициализация данных при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminStatus();
+            loadChatHistory();
+        });
 
         // Переключение вкладок
         function openTab(tabName) {
@@ -458,57 +492,121 @@
             });
         }
 
-        // Логика чата
+        /* =========================================
+           ЛОГИКА ЧАТА И ПОДДЕРЖКИ
+        ========================================= */
+        
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+        function checkAdminStatus() {
+            if (isAdmin) {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-login-link').style.display = 'none';
+            } else {
+                document.getElementById('admin-panel').style.display = 'none';
+                document.getElementById('admin-login-link').style.display = 'block';
+            }
+        }
+
+        function adminLogin() {
+            const login = prompt("Логин:");
+            const pass = prompt("Пароль:");
+
+            if (login === "mika" && pass === "2713") {
+                isAdmin = true;
+                localStorage.setItem('isAdmin', 'true');
+                checkAdminStatus();
+                alert("Доступ разрешен, Mika! Теперь ты пишешь от имени Администрации.");
+            } else {
+                alert("Ошибка! Неверные данные.");
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            localStorage.removeItem('isAdmin');
+            checkAdminStatus();
+            alert("Вы вышли из режима админа.");
+        }
+
         function sendMessage() {
             const input = document.getElementById('chat-input');
-            const messageText = input.value.trim();
+            const text = input.value.trim();
             
-            if (messageText === "") return;
+            if (text === "") return;
 
-            const chatMessages = document.getElementById('chat-messages');
-            const newMsg = document.createElement('div');
+            const messageObj = {
+                text: text,
+                type: isAdmin ? 'admin' : 'user',
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            // Сохраняем в localStorage
+            saveMessage(messageObj);
             
-            // Если залогинены как админ, пишем от имени админа
-            if (isAdmin) {
-                newMsg.className = 'message msg-admin';
-            } else {
-                newMsg.className = 'message msg-user';
-            }
-            
-            newMsg.textContent = messageText;
-            chatMessages.appendChild(newMsg);
-            
+            // Отображаем
+            renderMessage(messageObj);
+
             input.value = "";
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Прокрутка вниз
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
 
-            // Авто-ответ бота (если не админ)
+            // Имитация ответа, если пишет обычный юзер
             if (!isAdmin) {
                 setTimeout(() => {
-                    const reply = document.createElement('div');
-                    reply.className = 'message msg-admin';
-                    reply.textContent = "Ваше сообщение получено. Ожидайте ответа мастера!";
-                    chatMessages.appendChild(reply);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 1000);
+                    const reply = {
+                        text: "Твое послание доставлено в замок. Ожидай ответа мастера!",
+                        type: 'admin',
+                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    };
+                    renderMessage(reply);
+                    saveMessage(reply);
+                    container.scrollTop = container.scrollHeight;
+                }, 1500);
+            }
+        }
+
+        function renderMessage(msg) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `message ${msg.type === 'admin' ? 'msg-admin' : 'msg-user'}`;
+            div.innerHTML = `${msg.text} <span style="display:block; font-size:0.6rem; opacity:0.5; margin-top:5px; text-align:right;">${msg.time}</span>`;
+            container.appendChild(div);
+        }
+
+        function saveMessage(msg) {
+            let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            history.push(msg);
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = ""; // Очистка перед загрузкой
+            
+            let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            
+            if (history.length === 0) {
+                renderMessage({
+                    text: "Приветствуем! Опиши свою проблему или предложение, и наши мастера помогут тебе.",
+                    type: 'admin',
+                    time: "--:--"
+                });
+            } else {
+                history.forEach(msg => renderMessage(msg));
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearChat() {
+            if (confirm("Очистить всю историю переписки?")) {
+                localStorage.removeItem('chatHistory');
+                loadChatHistory();
             }
         }
 
         function handleKey(e) {
             if (e.key === 'Enter') sendMessage();
-        }
-
-        // Админ-вход
-        function adminLogin() {
-            const login = prompt("Введите логин:");
-            const pass = prompt("Введите пароль:");
-
-            if (login === "mika" && pass === "2713") {
-                isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                alert("Доступ разрешен. Теперь вы пишете от имени администрации.");
-            } else {
-                alert("Ошибка доступа. Неверные данные.");
-            }
         }
     </script>
 
