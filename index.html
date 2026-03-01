@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUS WORLD — Medieval Grind Minecraft</title>
+    <style>
+        /* Основные стили и сброс */
+        :root {
+            --main-color: #e60000; /* Главный кроваво-красный цвет */
+            --main-color-hover: #ff1a1a;
+            --dark-bg: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth; /* Плавная прокрутка для вкладок */
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Навигационная панель (Вкладки) */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(17, 17, 17, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            z-index: 1000;
+            border-bottom: 2px solid var(--main-color);
+            box-shadow: 0 4px 15px rgba(230, 0, 0, 0.3);
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            padding: 5px 10px;
+        }
+
+        .navbar a:hover {
+            color: var(--main-color);
+            text-shadow: 0 0 10px var(--main-color);
+        }
+
+        .navbar .tg-btn {
+            background: var(--main-color);
+            color: #fff;
+            padding: 5px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(230, 0, 0, 0.5);
+        }
+
+        .navbar .tg-btn:hover {
+            background: var(--main-color-hover);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.8);
+        }
+
+        /* Шапка с фоном (Фото 2) */
+        header {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('hero-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 5px solid var(--main-color);
+            margin-top: 50px; /* Отступ для navbar */
+        }
+
+        /* Логотип (Фото 1) */
+        .main-logo {
+            width: 300px;
+            max-width: 90%;
+            filter: drop-shadow(0 0 20px rgba(230, 0, 0, 0.6));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--main-color);
+            text-transform: uppercase;
+            margin-top: 20px;
+            text-shadow: 3px 3px 0px #000, 0 0 20px var(--main-color);
+        }
+
+        .server-status {
+            background: rgba(230, 0, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--main-color);
+            margin: 20px 0;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(230, 0, 0, 0.3);
+        }
+
+        .ip-box {
+            background: #2c2c2c;
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: 2px dashed var(--main-color);
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .ip-box:hover {
+            background: var(--main-color);
+            color: #fff;
+            box-shadow: 0 0 20px var(--main-color);
+            border-color: #fff;
+        }
+
+        .epic-subtitle {
+            font-size: 1.2rem;
+            color: #bbb;
+            max-width: 600px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Секция Режимов */
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            color: #fff;
+            margin: 60px 0 40px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 var(--main-color);
+        }
+
+        .modes-container {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .mode-card {
+            background: #252525;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #444;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 2px solid transparent;
+            transition: 0.3s;
+            border-radius: 15px;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--main-color);
+            box-shadow: 0 15px 40px rgba(230, 0, 0, 0.2);
+        }
+
+        .mode-card i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .mode-card h3 {
+            color: var(--main-color);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* Описание сервера и Команда */
+        .about {
+            padding: 80px 20px;
+            text-align: center;
+            background: #1e1e1e;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+
+        .about h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 2px 2px 0 var(--main-color);
+        }
+
+        .about p {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+            color: #bbb;
+        }
+
+        /* Карточки Команды */
+        .team-container {
+            max-width: 1000px;
+            margin: 50px auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .team-member {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+
+        .team-member:hover {
+            border-color: var(--main-color);
+            box-shadow: 0 0 15px rgba(230, 0, 0, 0.4);
+        }
+
+        .team-member h4 {
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .team-member .role {
+            color: var(--main-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .team-member a {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            background: #222;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            border: 1px solid #444;
+        }
+
+        .team-member a:hover {
+            background: #0088cc; /* Цвет Telegram */
+            border-color: #0088cc;
+        }
+
+        /* Футер */
+        footer {
+            padding: 40px;
+            text-align: center;
+            background: #111;
+            border-top: 5px solid var(--main-color);
+        }
+
+        .copy {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        /* Кнопка скролла */
+        .scroll-down {
+            margin-top: 30px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .scroll-down:hover {
+            color: var(--main-color);
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#home">Главная</a>
+        <a href="#modes">Режимы</a>
+        <a href="#about">О нас</a>
+        <a href="https://t.me/susworl" target="_blank" class="tg-btn">🔥 НАШ ТГК</a>
+    </nav>
+
+    <header id="home">
+        <img src="logo.png" alt="SUS WORLD Logo" class="main-logo">
+        <h1>SUS WORLD</h1>
+        <p style="font-size: 1.5rem; letter-spacing: 2px; color: #fff;">MEDIEVAL GRIND — EST. 2026</p>
+        
+        <p class="epic-subtitle">Суровое средневековье ждет. Мы только начинаем, впереди очень много грандиозных обновлений, битв и завоеваний!</p>
+
+        <div class="server-status">🔴 СЕРВЕР ОНЛАЙН: 124 ИГРОКА</div>
+
+        <div class="ip-box" onclick="copyIP()">
+            IP: play.susworld.net <span style="font-size: 0.8rem; display: block; color: #ccc;">(нажми, чтобы скопировать)</span>
+        </div>
+
+        <a href="#modes" class="scroll-down">▼ ЛИСТАЙ ВНИЗ, ЧТОБЫ УЗНАТЬ О РЕЖИМАХ ▼</a>
+    </header>
+
+    <h2 class="section-title" id="modes">Режимы Игры</h2>
+    <section class="modes-container">
+        <div class="mode-card">
+            <i>⚔️</i>
+            <h3>Гриферство</h3>
+            <p>Никаких правил! Строй, взрывай, захватывай замки врагов. Стань самым опасным рыцарем. 🗡️</p>
+        </div>
+
+        <div class="mode-card">
+            <i>🏴‍☠️</i>
+            <h3>Анархия</h3>
+            <p>Полная свобода. Мир без границ и админов. Выживет только сильнейший в этих диких землях! 🔥</p>
+        </div>
+
+        <div class="mode-card">
+            <i>🏕️</i>
+            <h3>Выживание</h3>
+            <p>Классика в средневековом стиле. Объединяйся в кланы, строй города и торгуй с другими. 🏛️</p>
+        </div>
+
+        <div class="mode-card">
+            <i>🙈</i>
+            <h3>Прятки</h3>
+            <p>Уникальные карты: старые рынки, замки и подземелья. Стань блоком или найди всех! 📦</p>
+        </div>
+
+        <div class="mode-card" style="grid-column: span 1;">
+            <i>🕵️‍♂️</i>
+            <h3>Мафия</h3>
+            <p>Настольная игра прямо в Майнкрафте. Кто предатель в королевском совете? Вычисли его! 🎭</p>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <h2>О НАС И НАШЕМ ПРОЕКТЕ 🏰</h2>
+        <p>
+            SUS WORLD — это не просто сервер, это целая эпоха. Мы создали уникальную атмосферу, где каждый камень 
+            пропитан историей. У нас ты найдешь сбалансированную экономику, честное ПвП и отзывчивую администрацию. 
+            Мы планируем ОЧЕНЬ много всего: новые данжи, мировые боссы, кастомная броня и оружие.
+            Присоединяйся к нашему комьюнити и начни свой путь от крестьянина до императора! 👑
+        </p>
+
+        <h2 style="margin-top: 60px; font-size: 2rem;">СОЗДАТЕЛИ ИМПЕРИИ</h2>
+        <div class="team-container">
+            <div class="team-member">
+                <h4>zxcbnm2</h4>
+                <div class="role">Владелец / Король</div>
+                <a href="https://t.me/zxcbnm2" target="_blank">Написать в ТГ</a>
+            </div>
+            
+            <div class="team-member">
+                <h4>Mikauior</h4>
+                <div class="role">Кодер / Маг Архитектуры</div>
+                <a href="https://t.me/Mikauior" target="_blank">Написать в ТГ</a>
+            </div>
+
+            <div class="team-member">
+                <h4>Sva100n69</h4>
+                <div class="role">Билдер / Главный Зодчий</div>
+                <a href="https://t.me/Sva100n69" target="_blank">Написать в ТГ</a>
+            </div>
+
+            <div class="team-member">
+                <h4>k0rtex</h4>
+                <div class="role">Тех. Админ / Кузнец Сервера</div>
+                <a href="https://t.me/k0rtex" target="_blank">Написать в ТГ</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="socials">
+            <p>ПРИСОЕДИНЯЙСЯ К НАМ:</p>
+            <div style="margin-top: 15px; font-size: 1.2rem;">
+                <a href="https://t.me/susworl" target="_blank" style="color: var(--main-color); text-decoration: none; margin: 0 10px; font-weight: bold;">[ НАШ ТЕЛЕГРАМ ]</a>
+            </div>
+        </div>
+        <p class="copy">© 2026 SUS WORLD. Все права защищены. Кровавое средневековье ждет.</p>
+    </footer>
+
+    <script>
+        function copyIP() {
+            const ip = "play.susworld.net";
+            navigator.clipboard.writeText(ip).then(() => {
+                alert("⚔️ IP сервера скопирован! Готовь меч, мы ждем тебя!");
+            });
+        }
+    </script>
+
+</body>
+</html>
