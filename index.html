@@ -474,6 +474,9 @@
            ОСНОВНАЯ ЛОГИКА И СОХРАНЕНИЕ
         ========================================= */
 
+        const botToken = "8640748769:AAEgyBzq8RlpR9Az4PG7197sTYNYWuffMw8";
+        const adminChatId = "8422158384"; // Твой ID установлен здесь
+
         let isAdmin = localStorage.getItem('isAdmin') === 'true';
 
         // Инициализация
@@ -502,7 +505,7 @@
                 localStorage.setItem('isAdmin', 'true');
                 checkAdminStatus();
                 alert("Доступ разрешен, Mika!");
-                loadChatHistory(); // Перерисовать с учетом прав
+                loadChatHistory();
             } else {
                 alert("Ошибка доступа!");
             }
@@ -529,17 +532,23 @@
             const text = input.value.trim();
             if (!text) return;
 
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateStr = now.toLocaleDateString() + " " + timeStr;
+
             const msg = {
                 text: text,
                 sender: isAdmin ? 'admin' : 'user',
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                time: timeStr
             };
 
             saveAndRender(msg);
             input.value = "";
 
-            // Если пишет юзер, имитируем "получение сообщения" на стороне админа
+            // ОТПРАВКА В ТЕЛЕГРАМ БОТА (если пишет юзер)
             if (!isAdmin) {
+                sendToTelegram(dateStr, text);
+                
                 setTimeout(() => {
                     const reply = {
                         text: "Запрос принят. Жди ответа админа!",
@@ -551,7 +560,21 @@
             }
         }
 
-        // СЕКРЕТНАЯ ФУНКЦИЯ ДЛЯ ТЕБЯ: Имитация сообщения от игрока
+        // Функция отправки в телеграм
+        function sendToTelegram(date, question) {
+            const messageToBot = `Вопрос с сайта\n[${date}]\n[${question}]`;
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: adminChatId,
+                    text: messageToBot
+                })
+            }).catch(err => console.error("Ошибка отправки в TG:", err));
+        }
+
         function simulateUserMsg() {
             const testMsg = {
                 text: "Привет, у меня проблема с заходом на сервер!",
