@@ -477,7 +477,6 @@
         const botToken = "8640748769:AAEgyBzq8RlpR9Az4PG7197sTYNYWuffMw8";
         const adminChatId = "8422158384"; 
 
-        // Генерируем ID сессии, чтобы бот знал, кому отвечать
         if (!localStorage.getItem('sessionID')) {
             localStorage.setItem('sessionID', Math.floor(Math.random() * 99999));
         }
@@ -486,11 +485,9 @@
         let isAdmin = localStorage.getItem('isAdmin') === 'true';
         let lastUpdateId = 0;
 
-        // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             checkAdminStatus();
             loadChatHistory();
-            // Запускаем проверку ответов от админа каждые 5 секунд
             setInterval(checkForReplies, 5000);
         });
 
@@ -527,7 +524,6 @@
             loadChatHistory();
         }
 
-        // Переключение вкладок
         function openTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active'));
@@ -535,7 +531,6 @@
             document.getElementById('btn-' + tabName).classList.add('active');
         }
 
-        // Работа с чатом
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -559,7 +554,7 @@
             }
         }
 
-        // Функция отправки в телеграм
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ: СРАЗУ С КНОПКОЙ ОТВЕТА
         function sendToTelegram(date, question) {
             const messageToBot = `Вопрос с сайта\nID: ${sessionID}\n[${date}]\n[${question}]`;
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
@@ -569,14 +564,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: adminChatId,
-                    text: messageToBot
+                    text: messageToBot,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: "📝 Ответить на сайт", callback_data: `site_reply_${sessionID}` }]
+                        ]
+                    }
                 })
             }).catch(err => console.error("Ошибка отправки в TG:", err));
         }
 
-        // Функция ПРОВЕРКИ ОТВЕТОВ ОТ БОТА
         async function checkForReplies() {
-            if (isAdmin) return; // Админу не нужно проверять ответы самому себе
+            if (isAdmin) return; 
 
             const url = `https://api.telegram.org/bot${botToken}/getUpdates?offset=${lastUpdateId + 1}`;
             try {
@@ -588,7 +587,6 @@
                         lastUpdateId = update.update_id;
                         if (update.message && update.message.text) {
                             const text = update.message.text;
-                            // Проверяем, наш ли это ID в сообщении бота
                             if (text.includes(`ОТВЕТ_ДЛЯ_САЙТА [ID:${sessionID}]`)) {
                                 const pureText = text.split(']: ')[1];
                                 const reply = {
@@ -597,7 +595,6 @@
                                     time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                                 };
                                 
-                                // Проверяем, не дубликат ли (по тексту)
                                 let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
                                 if (!history.some(m => m.text === pureText && m.sender === 'admin')) {
                                     saveAndRender(reply);
