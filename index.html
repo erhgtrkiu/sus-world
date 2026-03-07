@@ -15,6 +15,7 @@
             --chat-bg: #1a1a1a;
             --user-msg: #2c2c2c;
             --admin-msg: #4a0000;
+            --rules-accent: #ffcc00; /* Золотой акцент для законов */
         }
 
         * {
@@ -169,6 +170,85 @@
             background: var(--main-color);
             color: #fff;
             transform: scale(1.02);
+        }
+
+        /* =========================================
+           РАЗДЕЛ ПРАВИЛ (НОВОЕ)
+        ========================================= */
+        .rules-container {
+            width: 100%;
+            max-width: 900px;
+            text-align: left;
+            background: rgba(20, 20, 20, 0.9);
+            border-left: 4px solid var(--main-color);
+            padding: 40px;
+            border-radius: 0 20px 20px 0;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            margin-bottom: 50px;
+        }
+
+        .rules-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .rules-intro {
+            background: rgba(230, 0, 0, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(230, 0, 0, 0.2);
+            font-style: italic;
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+
+        .rule-category {
+            margin-bottom: 40px;
+        }
+
+        .rule-category h3 {
+            color: var(--rules-accent);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rule-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #222;
+            transition: 0.3s;
+        }
+
+        .rule-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--main-color);
+        }
+
+        .rule-title {
+            font-weight: bold;
+            color: #fff;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .rule-punishment {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--main-color);
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            background: rgba(230, 0, 0, 0.1);
+            border-radius: 4px;
         }
 
         /* РЕЖИМЫ */
@@ -377,6 +457,7 @@
     <nav class="navbar">
         <button onclick="openTab('home')" id="btn-home" class="active">Главная</button>
         <button onclick="openTab('modes')" id="btn-modes">Режимы</button>
+        <button onclick="openTab('rules')" id="btn-rules">Правила</button>
         <button onclick="openTab('about')" id="btn-about">О нас</button>
         <button onclick="openTab('support')" id="btn-support">Поддержка</button>
         <a href="https://t.me/susworl" target="_blank" class="tg-link">🔥 НАШ ТГК</a>
@@ -411,6 +492,117 @@
             <div class="mode-card"><i>🕵️‍♂️</i><h3>МАФИЯ</h3><p>Дворцовые интриги. Узнай, кто из твоих рыцарей — предатель, прежде чем он нанесет удар.</p></div>
         </div>
         <div class="tab-footer">ПЛАНИРУЕМ ОЧЕНЬ МНОГО НОВОГО. СЛЕДИ ЗА ОБНОВЛЕНИЯМИ.</div>
+    </section>
+
+    <section id="rules" class="tab-content">
+        <h2 style="font-size: 3rem; margin-bottom: 30px;">СВОД ЗАКОНОВ</h2>
+        
+        <div class="rules-container">
+            <div class="rules-header">
+                <h2 style="color: var(--main-color); font-size: 1.8rem;">⚖️ SUS WORLD PROJECT LAWS</h2>
+            </div>
+
+            <div class="rules-intro">
+                Данный свод правил является неокончательным до подтверждения владельца. Незнание правил не освобождает от ответственности. На нашем проекте действует четкая градация наказаний: от временного ограничения до полного отсечения от серверов.
+            </div>
+
+            <div class="rule-category">
+                <h3>I. ОБЩИЕ ПОЛОЖЕНИЯ И АККАУНТ</h3>
+                <div class="rule-item">
+                    <span class="rule-title">1.1. Мультиаккаунт и обход блокировок</span>
+                    Любая попытка зайти на сервер под другим аккаунтом во время действия бана.
+                    <br><span class="rule-punishment">Наказание: Перманентный бан всей сети по IP</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">1.2. Безопасность данных</span>
+                    Игрок несет полную ответственность за свой аккаунт. Взлом не является оправданием.
+                    <br><span class="rule-punishment">Наказание: Согласно тяжести нарушения</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">1.3. Передача аккаунта</span>
+                    Передача доступа к аккаунту третьим лицам.
+                    <br><span class="rule-punishment">Наказание: Перманентный бан аккаунта</span>
+                </div>
+            </div>
+
+            <div class="rule-category">
+                <h3>II. ИГРОВОЙ ПРОЦЕСС И ЧИТЫ</h3>
+                <div class="rule-item">
+                    <span class="rule-title">2.1. Стороннее ПО (Hard)</span>
+                    Использование Fly, KillAura, Speedhack и подобных читов.
+                    <br><span class="rule-punishment">Наказание: Перманентный бан</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">2.2. Стороннее ПО (Soft)</span>
+                    Использование X-Ray, автокликеров для АФК-ферм.
+                    <br><span class="rule-punishment">Наказание: Бан на 30 дней + Обнуление</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">2.3. Багоюз</span>
+                    Использование ошибок игры/плагинов. Дюпы караются строже.
+                    <br><span class="rule-punishment">Наказание: Бан от 7 дней до Перманента</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">2.4. Дестабилизация сервера</span>
+                    Лаг-машины, DDOS, атаки на хостинг.
+                    <br><span class="rule-punishment">Наказание: Чёрный список (ЧС) по IP</span>
+                </div>
+            </div>
+
+            <div class="rule-category">
+                <h3>III. ЭКОНОМИКА И ЧАТ</h3>
+                <div class="rule-item">
+                    <span class="rule-title">3.1. Мошенничество</span>
+                    Обман игроков при обмене или продаже ресурсов.
+                    <br><span class="rule-punishment">Наказание: Бан 14 дней + Изъятие</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">3.2. Коммерция (RMT)</span>
+                    Продажа игровых ценностей за реальные деньги вне магазина.
+                    <br><span class="rule-punishment">Наказание: Перманентный бан (Оба участника)</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">3.3. Гриферство</span>
+                    Разрушение чужих построек, заливание лавой/водой (вне механик).
+                    <br><span class="rule-punishment">Наказание: Бан от 3 до 7 дней</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">3.4. Нарушения в чате</span>
+                    Спам, капс, оскорбления.
+                    <br><span class="rule-punishment">Наказание: Мут до 24 часов</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">3.5. Реклама</span>
+                    Реклама сторонних серверов или сервисов.
+                    <br><span class="rule-punishment">Наказание: Перманентный бан</span>
+                </div>
+            </div>
+
+            <div class="rule-category">
+                <h3>IV. РЕГЛАМЕНТ ПЕРСОНАЛА (Staff)</h3>
+                <div class="rule-item">
+                    <span class="rule-title">4.1. Злоупотребление полномочиями</span>
+                    Использование прав в личных целях.
+                    <br><span class="rule-punishment">Наказание: Снятие + ЧС Персонала + Бан 30 дней</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">4.2. Халатность</span>
+                    Игнорирование репортов, покрывательство нарушителей.
+                    <br><span class="rule-punishment">Наказание: Выговор / Снятие</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">4.3. Слив информации</span>
+                    Разглашение данных админ-чатов или тех. подробностей.
+                    <br><span class="rule-punishment">Наказание: Глобальный ЧС + Бан по IP</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-title">4.4. Достоинство проекта</span>
+                    Неадекватное поведение или оскорбления игроков.
+                    <br><span class="rule-punishment">Наказание: Немедленное увольнение</span>
+                </div>
+            </div>
+        </div>
+        <div class="tab-footer">ПРАВИЛА МОГУТ БЫТЬ ДОПОЛНЕНЫ В ЛЮБОЙ МОМЕНТ.</div>
     </section>
 
     <section id="about" class="tab-content">
@@ -554,7 +746,6 @@
             }
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ: СРАЗУ С КНОПКОЙ ОТВЕТА
         function sendToTelegram(date, question) {
             const messageToBot = `Вопрос с сайта\nID: ${sessionID}\n[${date}]\n[${question}]`;
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
