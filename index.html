@@ -153,6 +153,23 @@
             font-weight: bold;
             color: #fff;
             margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ ОНЛАЙН СТАТУСА (ДОБАВЛЕНО) */
+        .status-dot {
+            display: inline-block;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #555; margin-right: 8px;
+        }
+        .status-online {
+            border-color: #00ff00 !important;
+            color: #00ff00 !important;
+            background: rgba(0, 255, 0, 0.15) !important;
+        }
+        .status-online .status-dot {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
         }
 
         .ip-box {
@@ -466,7 +483,7 @@
     <section id="home" class="tab-content active">
         <img src="logo.png" alt="SUS WORLD Logo" class="main-logo">
         <h1>SUS WORLD</h1>
-        <div class="server-status">🔴 СЕРВЕР В РАЗРАБОТКЕ: 124 ИГРОКА</div>
+        <div class="server-status" id="status-block">🔴 СЕРВЕР В РАЗРАБОТКЕ: 124 ИГРОКА</div>
         
         <div class="ip-box" onclick="copyIP()">
             IP: play.susworld.net
@@ -681,7 +698,34 @@
             checkAdminStatus();
             loadChatHistory();
             setInterval(checkForReplies, 5000);
+            
+            /* ВЫЗОВ ФУНКЦИИ ОБНОВЛЕНИЯ СТАТУСА (ДОБАВЛЕНО) */
+            updateStatus();
+            setInterval(updateStatus, 30000);
         });
+
+        /* =========================================
+           ФУНКЦИЯ ПОЛУЧЕНИЯ СТАТУСА (ДОБАВЛЕНО)
+        ========================================= */
+        async function updateStatus() {
+            const statusBlock = document.getElementById('status-block');
+            if (!statusBlock) return;
+            
+            try {
+                const response = await fetch('status.json?t=' + Date.now());
+                const data = await response.json();
+                
+                if (data.status === 'online') {
+                    statusBlock.classList.add('status-online');
+                    statusBlock.innerHTML = `<div class="status-dot"></div>ОНЛАЙН: ${data.online} / ${data.max}`;
+                } else {
+                    statusBlock.classList.remove('status-online');
+                    statusBlock.innerHTML = `🔴 СЕРВЕР ВЫКЛЮЧЕН`;
+                }
+            } catch (e) {
+                console.error("Ожидание данных от плагина...");
+            }
+        }
 
         function checkAdminStatus() {
             const panel = document.getElementById('admin-panel');
